@@ -1,10 +1,7 @@
 import { RPCClient } from "rpc-bitcoin"
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { decodeVaruintSequence, decodeBijectiveBase26 } from '@/app/lib'
-
-let RUNE_STARTING_ASM = 'OP_RETURN 82'
-let RUNE_FIRST_BLOCK = 809385
+import { RUNE_STARTING_ASM, decodeVaruintSequence, decodeBijectiveBase26 } from '@/app/lib'
 
 const url = process.env.BITCOIN_RPC_URL  || ""
 const port = Number.parseInt(process.env.BITCOIN_RPC_PORT || "0")
@@ -25,6 +22,7 @@ export function logRuneIssuance(tx: any) {
     let type: string = out['scriptPubKey']['type']
     let asm: string = out['scriptPubKey']['asm']
     if ( type === 'nulldata' && asm.startsWith(RUNE_STARTING_ASM) ) {
+      // we better parse the raw ASM as the 'asm' is mixing base10 and base16
       let runeMessages = asm.slice(RUNE_STARTING_ASM.length).split(' ').filter(s => s !== '')
       // console.log(tx['hash'], 'has', asm, 'with', runeMessages.length, 'rune messages:')
       
