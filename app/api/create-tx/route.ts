@@ -6,6 +6,25 @@ import type { NextRequest } from 'next/server'
 
 let DUST_AMOUNT = 546
 
+export function codeToHex(codeArray: string[]) {
+  let hexArray = []
+  for (let code of codeArray) {
+    console.log("code:", code)
+    if (code === 'OP_RETURN') {
+      hexArray.push('6A')
+    } else {
+      // Assuming data
+      let dataByteLength = (code.length / 2)
+      let dataPushOpCode = dataByteLength.toString(16).padStart(2, '0')
+      console.log(dataByteLength)
+      console.log(dataPushOpCode)
+      hexArray.push(dataPushOpCode)
+      hexArray.push(code)
+    }
+  }
+  return hexArray.join('')
+}
+
 export async function GET(request: NextRequest) {
   // let destination = request.nextUrl.searchParams.get('destination')
   // if (!destination || destination.length === 0) {
@@ -73,8 +92,10 @@ export async function GET(request: NextRequest) {
   console.log("output:", output)
   
   let runeTransferData = encodeVaruintSequence([0, output, amount*(10**decimals)])
+  console.log(runeTransferData)
   let runeIssuanceData = encodeVaruintSequence([encodeBijectiveBase26(ticker), decimals])
-  let runeOutputScript = 'OP_RETURN' + ' ' + 'R'.charCodeAt(0).toString(16) + ' ' + runeTransferData + ' ' + runeIssuanceData
+  let runeOutputScriptAsm = ['OP_RETURN', 'R'.charCodeAt(0).toString(16), runeTransferData, runeIssuanceData]
+  let runeOutputScriptHex = codeToHex(runeOutputScriptAsm)
   return NextResponse.json(
     {
       request: {
@@ -85,7 +106,8 @@ export async function GET(request: NextRequest) {
         output,
       },
       response: {
-        runeOutputScript,
+        runeOutputScriptAsm,
+        runeOutputScriptHex,
       }
     },
     {
