@@ -1,13 +1,8 @@
 import { RPCClient } from "rpc-bitcoin"
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { RUNE_STARTING_ASM, decodeVaruintSequence, decodeBijectiveBase26 } from '@/app/lib'
+import { client, RUNE_STARTING_ASM, decodeVaruintSequence, decodeBijectiveBase26 } from '@/app/lib'
 
-const url = process.env.BITCOIN_RPC_URL  || ""
-const port = Number.parseInt(process.env.BITCOIN_RPC_PORT || "0")
-const user = process.env.BITCOIN_RPC_USER  || ""
-const pass = process.env.BITCOIN_RPC_PASS  || ""
-const client = new RPCClient({ url, port, user, pass, timeout: 10000 })
 
 export function decodeTransfer(hexadecimalVaruintSequence: string) {
   return decodeVaruintSequence(hexadecimalVaruintSequence)
