@@ -15,7 +15,7 @@ pnpm dev
 #### Example:
 
 ```sh
-curl 'https://runes-zone.vercel.app/api/create-tx?source=bc1quff9mk054nrm0mqadq2h53jy582dukfkezs8h9&destination=bc1pg8uy9lucurmewx9wqlg7nk4zwa5ak8zk2t4ku5ycy7nshrhsglrqmu4yps&decimals=8&amount=21000000&ticker=C' | jq .
+curl 'https://runes.zone/api/create-tx?source=bc1quff9mk054nrm0mqadq2h53jy582dukfkezs8h9&destination=bc1pg8uy9lucurmewx9wqlg7nk4zwa5ak8zk2t4ku5ycy7nshrhsglrqmu4yps&decimals=8&amount=21000000&ticker=C' | jq .
 ```
 
 #### Parameters:
@@ -34,7 +34,7 @@ For now, this method just logs
 #### Example:
 
 ```sh
-curl 'localhost:3000/api/cron/persist-runes?count=4' | jq .
+curl 'https://runes.zone/api/cron/persist-runes?count=4' | jq .
 ```
 
 #### Parameters:
