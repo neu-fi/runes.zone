@@ -1,4 +1,4 @@
-import { client, encodeBijectiveBase26, encodeVaruintSequence } from '@/app/lib'
+import { codeToHex, client, encodeBijectiveBase26, encodeVaruintSequence } from '@/app/lib'
 
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
@@ -15,22 +15,6 @@ function toOutputScript(address: string): Buffer {
 
 function idToHash(txid: string): Buffer {
   return Buffer.from(txid, 'hex').reverse();
-}
-
-export function codeToHex(codeArray: string[]) {
-  let hexArray = []
-  for (let code of codeArray) {
-    if (code === 'OP_RETURN') {
-      hexArray.push('6A')
-    } else {
-      // Assuming data
-      let dataByteLength = (code.length / 2)
-      let dataPushOpCode = dataByteLength.toString(16).padStart(2, '0')
-      hexArray.push(dataPushOpCode)
-      hexArray.push(code)
-    }
-  }
-  return hexArray.join('')
 }
 
 export async function GET(request: NextRequest) {

@@ -1,18 +1,8 @@
-import { RPCClient } from "rpc-bitcoin"
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { client, RUNE_STARTING_ASM, decodeVaruintSequence, decodeBijectiveBase26 } from '@/app/lib'
 
-
-export function decodeTransfer(hexadecimalVaruintSequence: string) {
-  return decodeVaruintSequence(hexadecimalVaruintSequence)
-}
-
-export function decodeIssuance(hexadecimalVaruintSequence: string) {
-  return decodeVaruintSequence(hexadecimalVaruintSequence)
-}
-
-export function logRuneIssuance(tx: any) {
+function logRuneIssuance(tx: any) {
   for (let out of tx['vout']) {
     let type: string = out['scriptPubKey']['type']
     let asm: string = out['scriptPubKey']['asm']

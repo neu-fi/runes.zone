@@ -6,12 +6,27 @@ var Buffer = require('safe-buffer').Buffer
 export const RUNE_STARTING_ASM = 'OP_RETURN 82'
 export const RUNE_FIRST_BLOCK = 809385
 
-
 const url = process.env.BITCOIN_RPC_URL  || ""
 const port = Number.parseInt(process.env.BITCOIN_RPC_PORT || "0")
 const user = process.env.BITCOIN_RPC_USER  || ""
 const pass = process.env.BITCOIN_RPC_PASS  || ""
 export const client = new RPCClient({ url, port, user, pass, timeout: 10000 })
+
+export function codeToHex(codeArray: string[]) {
+  let hexArray = []
+  for (let code of codeArray) {
+    if (code === 'OP_RETURN') {
+      hexArray.push('6A')
+    } else {
+      // Assuming data
+      let dataByteLength = (code.length / 2)
+      let dataPushOpCode = dataByteLength.toString(16).padStart(2, '0')
+      hexArray.push(dataPushOpCode)
+      hexArray.push(code)
+    }
+  }
+  return hexArray.join('')
+}
 
 // str must be uppercase A-Z only!
 export function encodeBijectiveBase26(str: string) {
