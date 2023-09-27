@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bitcoinjs-lib": "^6.1.5",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",

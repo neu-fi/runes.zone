@@ -1,23 +1,21 @@
-import { RUNE_STARTING_ASM, encodeBijectiveBase26, encodeVaruintSequence } from '@/app/lib'
+import { encodeBijectiveBase26, encodeVaruintSequence } from '@/app/lib'
 
 import { RPCClient } from "rpc-bitcoin"
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import * as bitcoin from 'bitcoinjs-lib'
 
 let DUST_AMOUNT = 546
 
 export function codeToHex(codeArray: string[]) {
   let hexArray = []
   for (let code of codeArray) {
-    console.log("code:", code)
     if (code === 'OP_RETURN') {
       hexArray.push('6A')
     } else {
       // Assuming data
       let dataByteLength = (code.length / 2)
       let dataPushOpCode = dataByteLength.toString(16).padStart(2, '0')
-      console.log(dataByteLength)
-      console.log(dataPushOpCode)
       hexArray.push(dataPushOpCode)
       hexArray.push(code)
     }
@@ -96,6 +94,7 @@ export async function GET(request: NextRequest) {
   let runeIssuanceData = encodeVaruintSequence([encodeBijectiveBase26(ticker), decimals])
   let runeOutputScriptAsm = ['OP_RETURN', 'R'.charCodeAt(0).toString(16), runeTransferData, runeIssuanceData]
   let runeOutputScriptHex = codeToHex(runeOutputScriptAsm)
+  let runeOutputScript = bitcoin.script.decompile(Buffer.from(runeOutputScriptHex,'hex'))
   return NextResponse.json(
     {
       request: {
@@ -108,6 +107,7 @@ export async function GET(request: NextRequest) {
       response: {
         runeOutputScriptAsm,
         runeOutputScriptHex,
+        runeOutputScript,
       }
     },
     {
