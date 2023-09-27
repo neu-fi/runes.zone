@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Runes Zone
 
 ## Getting Started
 
@@ -8,23 +8,35 @@ First, run the development server:
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API endpoints
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Create Transaction
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+#### Example:
 
-## Learn More
+```sh
+curl 'https://runes-zone.vercel.app/api/create-tx?source=bc1quff9mk054nrm0mqadq2h53jy582dukfkezs8h9&destination=bc1pg8uy9lucurmewx9wqlg7nk4zwa5ak8zk2t4ku5ycy7nshrhsglrqmu4yps&decimals=8&amount=21000000&ticker=C' | jq .
+```
 
-To learn more about Next.js, take a look at the following resources:
+#### Parameters:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+ * `source`: The sender address
+ * `destination`: The address to send runes. Use: `bc1pg8uy9lucurmewx9wqlg7nk4zwa5ak8zk2t4ku5ycy7nshrhsglrqmu4yps`
+ * `decimals`: Use `8``
+ * `amount`: Use `21000000` (This creates 21M * 10^8 units)
+ * `ticker`: Use only capital letters such as `NEUFI`. 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+### Persist Runes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+For now, this method just logs
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+#### Example:
+
+```sh
+curl 'localhost:3000/api/cron/persist-runes?count=4' | jq .
+```
+
+#### Parameters:
+
+ * `count`: The count of the most recent blocks to scan.

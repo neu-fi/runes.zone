@@ -75,27 +75,14 @@ export async function GET(request: NextRequest) {
     )
   }
   let amount = Number.parseInt(rawAmount)
-  let rawOutput = request.nextUrl.searchParams.get('output')
-  if (!rawOutput) {
-    return NextResponse.json(
-      {
-        message: 'output query parameter must be provided',
-      },
-      {
-        status: 400,
-      }
-    )
-  }
-  let output = Number.parseInt(rawOutput)
 
   console.log("source:", source)
   console.log("destination:", destination)
   console.log("ticker:", ticker)
   console.log("decimals:", decimals)
   console.log("amount:", amount)
-  console.log("output:", output)
   
-  let runeTransferData = encodeVaruintSequence([0, output, amount*(10**decimals)])
+  let runeTransferData = encodeVaruintSequence([0, 1, amount*(10**decimals)])
   console.log(runeTransferData)
   let runeIssuanceData = encodeVaruintSequence([encodeBijectiveBase26(ticker), decimals])
   let runeOutputScriptAsm = ['OP_RETURN', 'R'.charCodeAt(0).toString(16), runeTransferData, runeIssuanceData]
@@ -145,7 +132,6 @@ export async function GET(request: NextRequest) {
         ticker,
         decimals,
         amount,
-        output,
       },
       middleware: {
         txInputs,
