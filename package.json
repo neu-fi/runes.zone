@@ -12,7 +12,8 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "rpc-bitcoin": "^2.0.0"
+    "rpc-bitcoin": "^2.0.0",
+    "varuint-bitcoin": "^1.1.2"
   },
   "devDependencies": {
     "@types/node": "latest",
