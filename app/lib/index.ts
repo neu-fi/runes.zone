@@ -1,19 +1,23 @@
 import * as varuint from 'varuint-bitcoin'
 var Buffer = require('safe-buffer').Buffer
 
+export const RUNE_STARTING_ASM = 'OP_RETURN 82'
+export const RUNE_FIRST_BLOCK = 809385
+
 // str must be uppercase A-Z only!
-function encodeBijectiveBase26(str: string) {
-  let encode = 0
-  if ( /^([A-Z])+$/.test(str) ) {
-    str.split('').forEach( (c, i) => {
-      let charIndex = c.charCodeAt(0) - "A".charCodeAt(0) + 1
-      let exponent = str.length - 1 - i
-      let multiplier = 26 ** exponent
-      let letterEncode = charIndex * multiplier
-      encode += letterEncode
-    })
+export function encodeBijectiveBase26(str: string) {
+  if ( /^([A-Z])+$/.test(str) == false ) {
+    throw "Invalid bijectiveBase26 input, not all uppercase"
   }
 
+  let encode = 0
+  str.split('').forEach( (c, i) => {
+    let charIndex = c.charCodeAt(0) - "A".charCodeAt(0) + 1
+    let exponent = str.length - 1 - i
+    let multiplier = 26 ** exponent
+    let letterEncode = charIndex * multiplier
+    encode += letterEncode
+  })
   return encode
 }
 
@@ -59,4 +63,9 @@ export function decodeVaruintSequence(hexadecimalVaruintSequence: string) {
     }
   }
   return decodedIntegers
+}
+
+export function encodeVaruintSequence(numberArray: number[]) {
+  let buffer = Buffer.concat(numberArray.map(num => varuint.encode(num)))
+  return buffer.toString('hex').toUpperCase()
 }
