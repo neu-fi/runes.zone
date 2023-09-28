@@ -6,8 +6,9 @@ import * as ecc from 'tiny-secp256k1'
 import * as bitcoin from 'bitcoinjs-lib'
 bitcoin.initEccLib(ecc)
 
-let DUST_AMOUNT = 546
-let FEE_AMOUNT = 5000
+let DUST_AMOUNT = 330
+let FEE_AMOUNT = 3500
+let MINIMUM_CHANGE_AMOUNT = 3000
 
 function toOutputScript(address: string): Buffer {
   return bitcoin.address.toOutputScript(address)
@@ -114,14 +115,18 @@ export async function GET(request: NextRequest) {
     txInputs.push(unspent[txInputsIndex])
     txInputsTotalAmount += Math.floor(unspent[txInputsIndex].amount * 10**8)
   }
-  let outputAmount = txInputsTotalAmount - FEE_AMOUNT // Bigger than or equal to DUST_AMOUNT
 
   const tx = new bitcoin.Transaction()
   for ( let txInput of txInputs ) {
     tx.addInput( idToHash(txInput.txid), txInput.vout )
   }
   tx.addOutput(runeOutputScriptBuffer, 0)
-  tx.addOutput(toOutputScript(destination), outputAmount)
+  if ( FEE_AMOUNT + DUST_AMOUNT + MINIMUM_CHANGE_AMOUNT < txInputsTotalAmount ) {
+    tx.addOutput(toOutputScript(destination), DUST_AMOUNT)
+    tx.addOutput(toOutputScript(source), txInputsTotalAmount - (FEE_AMOUNT + DUST_AMOUNT))
+  } else {
+    tx.addOutput(toOutputScript(destination), txInputsTotalAmount - FEE_AMOUNT)
+  }
   let txHex = tx.toHex()
 
   return NextResponse.json(

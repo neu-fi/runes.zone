@@ -82,7 +82,9 @@ export async function GET(request: NextRequest) {
     // console.log("---=== block(",blockheight,")>> ===---")
     // console.log('')
     const blockhash = await client.getblockhash({ height: blockheight })
+    console.log('got', blockheight, 'hash:', blockhash)
     const block = await client.getblock({ blockhash, verbosity: 2 })
+    console.log('got', blockhash, 'content')
     for (let tx of block['tx']) {
       logRuneIssuance(tx)
     }

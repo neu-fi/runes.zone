@@ -10,7 +10,7 @@ const url = process.env.BITCOIN_RPC_URL  || ""
 const port = Number.parseInt(process.env.BITCOIN_RPC_PORT || "0")
 const user = process.env.BITCOIN_RPC_USER  || ""
 const pass = process.env.BITCOIN_RPC_PASS  || ""
-export const client = new RPCClient({ url, port, user, pass, timeout: 10000 })
+export const client = new RPCClient({ url, port, user, pass, timeout: 30000 })
 
 export function codeToHex(codeArray: string[]) {
   let hexArray = []
