@@ -7,8 +7,7 @@ import * as bitcoin from 'bitcoinjs-lib'
 bitcoin.initEccLib(ecc)
 
 let DUST_AMOUNT = 330
-let FEE_AMOUNT = 3500
-let MINIMUM_CHANGE_AMOUNT = 3000
+let MINIMUM_CHANGE_AMOUNT = 2500
 
 function toOutputScript(address: string): Buffer {
   return bitcoin.address.toOutputScript(address)
@@ -18,7 +17,21 @@ function idToHash(txid: string): Buffer {
   return Buffer.from(txid, 'hex').reverse();
 }
 
+async function estimateFee( txVirtualSize: number ) {
+  let feePremium = 1.25 // 25% more than necessary
+  let feeRateInBitcoinsperKiloByte = (await client.estimatesmartfee({ conf_target: 1 }))['feerate']
+  let feeRateInSatoshisperKiloByte = feeRateInBitcoinsperKiloByte * 10**8
+  let feeRateInSatoshisperVirtualByte = feeRateInSatoshisperKiloByte / 4000
+  return Math.ceil(feePremium *  txVirtualSize * feeRateInSatoshisperVirtualByte)
+}
+
+function approximatelyEqual (number1: number, number2: number, maximumDifferenceRatio = 0.05) {
+  return Math.abs((number1 - number2) / number1) <= maximumDifferenceRatio  
+}
+
 export async function GET(request: NextRequest) {
+  let APPROXIMATE_FEE_AMOUNT = await estimateFee(154)
+
   let source = request.nextUrl.searchParams.get('source')
   if (!source || source.length === 0) {
     return NextResponse.json(
@@ -30,6 +43,7 @@ export async function GET(request: NextRequest) {
       }
     )
   }
+  // TODO: Require destination being Taproot because 330 is DUST_AMOUNT for taproot
   let destination = request.nextUrl.searchParams.get('destination')
   if (!destination || destination.length === 0) {
     return NextResponse.json(
@@ -77,14 +91,7 @@ export async function GET(request: NextRequest) {
   }
   let amount = Number.parseInt(rawAmount)
 
-  console.log("source:", source)
-  console.log("destination:", destination)
-  console.log("ticker:", ticker)
-  console.log("decimals:", decimals)
-  console.log("amount:", amount)
-  
   let runeTransferData = encodeVaruintSequence([0, 1, amount*(10**decimals)])
-  console.log(runeTransferData)
   let runeIssuanceData = encodeVaruintSequence([encodeBijectiveBase26(ticker), decimals])
   let runeOutputScriptAsm = ['OP_RETURN', 'R'.charCodeAt(0).toString(16), runeTransferData, runeIssuanceData]
   let runeOutputScriptHex = codeToHex(runeOutputScriptAsm)
@@ -101,7 +108,7 @@ export async function GET(request: NextRequest) {
   let txInputs = []
   let txInputsTotalAmount = 0
   
-  for ( let txInputsIndex = 0; txInputsTotalAmount < FEE_AMOUNT + DUST_AMOUNT; txInputsIndex++ ) {
+  for ( let txInputsIndex = 0; txInputsTotalAmount < APPROXIMATE_FEE_AMOUNT + DUST_AMOUNT; txInputsIndex++ ) {
     if ( txInputsIndex === unspent.length ) {
       return NextResponse.json(
         {
@@ -121,13 +128,41 @@ export async function GET(request: NextRequest) {
     tx.addInput( idToHash(txInput.txid), txInput.vout )
   }
   tx.addOutput(runeOutputScriptBuffer, 0)
-  if ( FEE_AMOUNT + DUST_AMOUNT + MINIMUM_CHANGE_AMOUNT < txInputsTotalAmount ) {
+  
+  
+  if ( APPROXIMATE_FEE_AMOUNT + DUST_AMOUNT + MINIMUM_CHANGE_AMOUNT < txInputsTotalAmount ) {
+    let estimatedFinalTxVirtualSize = 154
+    let fee = await estimateFee(estimatedFinalTxVirtualSize)
     tx.addOutput(toOutputScript(destination), DUST_AMOUNT)
-    tx.addOutput(toOutputScript(source), txInputsTotalAmount - (FEE_AMOUNT + DUST_AMOUNT))
+    tx.addOutput(toOutputScript(source), txInputsTotalAmount - (fee + DUST_AMOUNT))
+    if( !approximatelyEqual(estimatedFinalTxVirtualSize, tx.virtualSize()) ) {
+      return NextResponse.json(
+        {
+          message: 'transaction size calculation error'
+        },
+        {
+          status: 500,
+        }
+      )
+    }
   } else {
-    tx.addOutput(toOutputScript(destination), txInputsTotalAmount - FEE_AMOUNT)
+    let estimatedFinalTxVirtualSize = 123
+    let fee = await estimateFee(estimatedFinalTxVirtualSize)
+    tx.addOutput(toOutputScript(destination), txInputsTotalAmount - fee)
+    if( !approximatelyEqual(estimatedFinalTxVirtualSize, tx.virtualSize()) ) {
+      return NextResponse.json(
+        {
+          message: 'transaction size calculation error'
+        },
+        {
+          status: 500,
+        }
+      )
+    }
   }
   let txHex = tx.toHex()
+
+  console.log('fee satoshis', )
 
   return NextResponse.json(
     {
