@@ -24,7 +24,18 @@ const FormSchema = z.object({
       message: "Symbol must be at least 1 characters.",
     })
     .refine((value) => /^[A-Z]+$/.test(value), "The only valid characters are A through Z."),
-
+  source: z
+    .string()
+    .min(14, {
+      message: "Bitcoin addresses are at least 14 characters.",
+    })
+    .refine((value) => /^[13|bc1][a-km-zA-HJ-NP-Z1-9]{25,87}$/.test(value), "Not a valid bitcoin address."),
+  destination: z
+    .string()
+    .min(14, {
+      message: "Bitcoin addresses are at least 14 characters.",
+    })
+    .refine((value) => /^[13|bc1][a-km-zA-HJ-NP-Z1-9]{13,87}$/.test(value), "Not a valid bitcoin address."),
 })
 
 export default function IssueRuneForm() {
@@ -32,6 +43,8 @@ export default function IssueRuneForm() {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       symbol: "",
+      source: "",
+      destination: "",
     },
   })
 
@@ -40,7 +53,7 @@ export default function IssueRuneForm() {
     toast({
       title: "You submitted the following values:",
       description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+        <pre className="mt-2 w-[330px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
         </pre>
       ),
@@ -57,10 +70,42 @@ export default function IssueRuneForm() {
             <FormItem>
               <FormLabel>Symbol</FormLabel>
               <FormControl>
-                <Input placeholder="SYMBOL" {...field} />
+                <Input placeholder="SYMBL" {...field} />
               </FormControl>
               <FormDescription>
-                Symbols consist of uppercase letters.
+                Symbols consist of uppercase letters. Make sure it's not issued previously.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="source"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Source address</FormLabel>
+              <FormControl>
+                <Input placeholder="bc123...56789" {...field} />
+              </FormControl>
+              <FormDescription>
+                Your address that holds some bitcoin and can sign raw transactions.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="destination"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Destination address</FormLabel>
+              <FormControl>
+                <Input placeholder="bc123...56789" {...field} />
+              </FormControl>
+              <FormDescription>
+                An address that you won't use until a Rune implementation exists.
               </FormDescription>
               <FormMessage />
             </FormItem>
