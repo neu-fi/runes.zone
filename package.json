@@ -9,13 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-icons": "^1.3.0",
     "bitcoinjs-lib": "^6.1.5",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "react-hook-form": "^7.46.2",
     "rpc-bitcoin": "^2.0.0",
+    "tailwind-merge": "^1.14.0",
+    "tailwindcss-animate": "^1.0.7",
     "tiny-secp256k1": "^2.2.3",
-    "varuint-bitcoin": "^1.1.2"
+    "varuint-bitcoin": "^1.1.2",
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@types/node": "latest",
