@@ -9,7 +9,7 @@ bitcoin.initEccLib(ecc)
 let DUST_AMOUNT = 330
 let MINIMUM_CHANGE_AMOUNT = 2500
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   async function estimateFee( txVirtualSize: number ) {
     let feePremium = 1.25 // 25% more than necessary
     let feeRateInBitcoinsperKiloByte = (await client.estimatesmartfee({ conf_target: 1 }))['feerate']
