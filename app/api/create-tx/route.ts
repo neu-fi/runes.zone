@@ -9,27 +9,27 @@ bitcoin.initEccLib(ecc)
 let DUST_AMOUNT = 330
 let MINIMUM_CHANGE_AMOUNT = 2500
 
-function toOutputScript(address: string): Buffer {
-  return bitcoin.address.toOutputScript(address)
-}
-
-function idToHash(txid: string): Buffer {
-  return Buffer.from(txid, 'hex').reverse();
-}
-
-async function estimateFee( txVirtualSize: number ) {
-  let feePremium = 1.25 // 25% more than necessary
-  let feeRateInBitcoinsperKiloByte = (await client.estimatesmartfee({ conf_target: 1 }))['feerate']
-  let feeRateInSatoshisperKiloByte = feeRateInBitcoinsperKiloByte * 10**8
-  let feeRateInSatoshisperVirtualByte = feeRateInSatoshisperKiloByte / 4000
-  return Math.ceil(feePremium *  txVirtualSize * feeRateInSatoshisperVirtualByte)
-}
-
-function approximatelyEqual (number1: number, number2: number, maximumDifferenceRatio = 0.05) {
-  return Math.abs((number1 - number2) / number1) <= maximumDifferenceRatio  
-}
-
 export async function GET(request: NextRequest) {
+  async function estimateFee( txVirtualSize: number ) {
+    let feePremium = 1.25 // 25% more than necessary
+    let feeRateInBitcoinsperKiloByte = (await client.estimatesmartfee({ conf_target: 1 }))['feerate']
+    let feeRateInSatoshisperKiloByte = feeRateInBitcoinsperKiloByte * 10**8
+    let feeRateInSatoshisperVirtualByte = feeRateInSatoshisperKiloByte / 4000
+    return Math.ceil(feePremium *  txVirtualSize * feeRateInSatoshisperVirtualByte)
+  }
+  
+  function toOutputScript(address: string): Buffer {
+    return bitcoin.address.toOutputScript(address)
+  }
+  
+  function idToHash(txid: string): Buffer {
+    return Buffer.from(txid, 'hex').reverse();
+  }
+  
+  function approximatelyEqual (number1: number, number2: number, maximumDifferenceRatio = 0.05) {
+    return Math.abs((number1 - number2) / number1) <= maximumDifferenceRatio  
+  }
+
   let APPROXIMATE_FEE_AMOUNT = await estimateFee(154)
 
   let source = request.nextUrl.searchParams.get('source')
