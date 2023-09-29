@@ -73,7 +73,7 @@ export default function IssueRuneForm() {
                 <Input placeholder="SYMBL" {...field} />
               </FormControl>
               <FormDescription>
-                Symbols consist of uppercase letters. Make sure it's not issued previously.
+                Symbols consist of uppercase letters. Make sure it&apos;s not issued previously.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -105,7 +105,7 @@ export default function IssueRuneForm() {
                 <Input placeholder="bc123...56789" {...field} />
               </FormControl>
               <FormDescription>
-                An address that you won't use until a Rune implementation exists.
+                An address that you won&apos;t use until a Rune implementation exists.
               </FormDescription>
               <FormMessage />
             </FormItem>

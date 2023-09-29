@@ -37,7 +37,7 @@ export default function Home() {
           <CardHeader>
             <CardTitle>Issue a Rune token</CardTitle>
             <CardDescription>
-              Most likely, these artifacts won't have a market value.
+              Most likely, these artifacts will not have any value.
               Use at your own risk after reading the <a href="https://x.com" className='underline text-black'>docs</a>.
             </CardDescription>
           </CardHeader>
@@ -72,7 +72,7 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <h2 className={`mb-3 text-2xl font-semibold`}>
-            Casey's Blog Post{' '}
+            Casey&apos;s Blog Post{' '}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
               -&gt;
             </span>
@@ -89,7 +89,7 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <h2 className={`mb-3 text-2xl font-semibold`}>
-            Poshi's Rune Index{' '}
+            Poshi&apos;s Rune Index{' '}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
               -&gt;
             </span>
